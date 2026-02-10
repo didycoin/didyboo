@@ -1,65 +1,61 @@
-// ----- Scene, Camera, Renderer -----
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb); // sky
+scene.background = new THREE.Color(0x87ceeb);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.set(0, 2, 5); // start a bit above ground and back
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.set(0, 2, 5);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("game").appendChild(renderer.domElement);
 
-// ----- Lighting -----
-const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-dirLight.position.set(50, 100, 50);
-scene.add(dirLight);
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(10, 20, 10);
+scene.add(light);
+scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-const ambientLight = new THREE.AmbientLight(0x888888);
-scene.add(ambientLight);
-
-// ----- Ground -----
-const groundMat = new THREE.MeshPhongMaterial({ color: 0x228B22 });
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(500,500), groundMat);
-ground.rotation.x = -Math.PI/2;
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(500, 500),
+  new THREE.MeshPhongMaterial({ color: 0x228B22 })
+);
+ground.rotation.x = -Math.PI / 2;
 scene.add(ground);
 
-// ----- First-person controls -----
 const controls = new THREE.PointerLockControls(camera, document.body);
-document.body.addEventListener('click', () => controls.lock());
+document.body.addEventListener("click", () => controls.lock());
 
-// ----- Low-poly gun -----
 const gun = new THREE.Mesh(
-  new THREE.BoxGeometry(0.3,0.2,1),
+  new THREE.BoxGeometry(0.3, 0.2, 1),
   new THREE.MeshPhongMaterial({ color: 0x333333 })
 );
 gun.position.set(0.5, -0.3, -1);
 camera.add(gun);
 scene.add(camera);
 
-// ----- Player movement -----
 const keys = {};
-document.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
-document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
 
-function movePlayer() {
-  const speed = 0.3;
-  if (keys['w']) controls.moveForward(speed);
-  if (keys['s']) controls.moveForward(-speed);
-  if (keys['a']) controls.moveRight(-speed);
-  if (keys['d']) controls.moveRight(speed);
+function move() {
+  if (keys.w) controls.moveForward(0.2);
+  if (keys.s) controls.moveForward(-0.2);
+  if (keys.a) controls.moveRight(-0.2);
+  if (keys.d) controls.moveRight(0.2);
 }
 
-// ----- Animate -----
 function animate() {
   requestAnimationFrame(animate);
-  movePlayer();
+  move();
   renderer.render(scene, camera);
 }
 animate();
 
-// ----- Handle resize -----
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth/window.innerHeight;
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
