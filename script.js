@@ -1,22 +1,20 @@
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js";
+import { PointerLockControls } from "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/controls/PointerLockControls.js";
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
 camera.position.set(0, 2, 5);
 
 const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(innerWidth, innerHeight);
 document.getElementById("game").appendChild(renderer.domElement);
 
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(10, 20, 10);
 scene.add(light);
-scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
 const ground = new THREE.Mesh(
   new THREE.PlaneGeometry(500, 500),
@@ -25,8 +23,9 @@ const ground = new THREE.Mesh(
 ground.rotation.x = -Math.PI / 2;
 scene.add(ground);
 
-const controls = new THREE.PointerLockControls(camera, document.body);
+const controls = new PointerLockControls(camera, document.body);
 document.body.addEventListener("click", () => controls.lock());
+scene.add(controls.getObject());
 
 const gun = new THREE.Mesh(
   new THREE.BoxGeometry(0.3, 0.2, 1),
@@ -34,11 +33,10 @@ const gun = new THREE.Mesh(
 );
 gun.position.set(0.5, -0.3, -1);
 camera.add(gun);
-scene.add(camera);
 
 const keys = {};
-document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
-document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
 
 function move() {
   if (keys.w) controls.moveForward(0.2);
@@ -54,8 +52,8 @@ function animate() {
 }
 animate();
 
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(innerWidth, innerHeight);
 });
